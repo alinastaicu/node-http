@@ -14,12 +14,16 @@ const server = http.createServer((req, res) => {
     if (req.url == '/') fileUrl = '/index.html';
     else fileUrl = req.url;
 
-    var filePath = path.resolve('./public' + fileUrl);
+    var filePath = path.resolve(`./public/${fileUrl}`);
     const fileExt = path.extname(filePath);
     if (fileExt == '.html') {
       fs.exists(filePath, exists => {
         if (!exists) {
           res.statusCode = 400;
+          /**
+           * Content type header tells clients what type of response it is -> i.e. browsers
+           * if "application/pdf" the browser will display it as pdf for exapmle
+           */
           res.setHeader('Content-Type', 'text/html');
           res.end('<html><body><h1>Error 404: ' + fileUrl + ' not found </h1></body></html>');
 
@@ -27,6 +31,7 @@ const server = http.createServer((req, res) => {
         }
         res.statusCode = 200;
         res.setHeader('Content-Type', 'text/html');
+        console.log('flePath', filePath);
         fs.createReadStream(filePath).pipe(res);
       });
     } else {
